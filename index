@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nagoya 2026: Our Romantic Journey</title>
+    <style>
+        :root {
+            --primary: #d4a5a5; /* 櫻花粉 */
+            --secondary: #393e46; /* 深灰 */
+            --bg: #f8f4f4; /* 溫暖米白 */
+            --white: #ffffff;
+            --accent: #c77dff; /* 浪漫紫 */
+            --text-light: #666;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', 'PingFang TC', 'Microsoft JhengHei', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg);
+            color: var(--secondary);
+            line-height: 1.7;
+        }
+
+        /* Hero Section */
+        header {
+            background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=1920&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center 60%;
+            height: 75vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+            position: relative;
+        }
+        
+        header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 100px;
+            background: linear-gradient(to top, var(--bg), transparent);
+        }
+
+        header h1 {
+            font-size: 4rem;
+            margin-bottom: 0.5rem;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.4);
+            font-weight: 300;
+            letter-spacing: 2px;
+        }
+
+        header p {
+            font-size: 1.6rem;
+            font-weight: 300;
+            background: rgba(255,255,255,0.2);
+            padding: 5px 20px;
+            border-radius: 30px;
+            backdrop-filter: blur(5px);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1000px;
+            margin: -50px auto 0; /* Overlap header */
+            padding: 0 20px 40px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .section-title {
+            text-align: center;
+            color: var(--secondary);
+            margin: 50px 0 30px;
+            font-size: 2.2rem;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+        
+        .section-title span {
+             border-bottom: 3px solid var(--primary);
+             padding-bottom: 10px;
+        }
+
+        /* Timeline Cards */
+        .timeline { position: relative; }
+
+        .day-card {
+            background: var(--white);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            margin-bottom: 35px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+
+        @media(min-width: 768px) {
+            .day-card { flex-direction: row; }
+            .day-card:hover { transform: translateY(-7px); box-shadow: 0 15px 40px rgba(0,0,0,0.12); }
+        }
+
+        .day-date {
+            background: var(--primary);
+            background: linear-gradient(135deg, var(--primary), #e8c4c4);
+            color: white;
+            padding: 25px;
+            min-width: 130px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .day-date .date { font-size: 1.8rem; font-weight: bold; line-height: 1; }
+        .day-date .weekday { font-size: 1rem; opacity: 0.9; margin-top: 5px; }
+
+        .day-content { padding: 25px 30px; flex-grow: 1; }
+        .day-content h3 { margin-top: 0; color: var(--secondary); font-weight: 500; }
+
+        .activity-list { list-style: none; padding: 0; margin: 0; }
+
+        .activity-item {
+            padding: 12px 0;
+            border-bottom: 1px dashed #eee;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: color 0.2s;
+            font-size: 1.05rem;
+        }
+
+        .activity-item:last-child { border-bottom: none; }
+        .activity-item:hover { color: var(--primary); }
+        .activity-item .time { font-weight: 600; margin-right: 20px; color: var(--primary); min-width: 65px; font-size: 0.9rem;}
+        .activity-item .icon { margin-left: auto; font-size: 1.2rem; color: #ddd; transition: transform 0.2s;}
+        .activity-item:hover .icon { transform: translateX(5px); color: var(--primary); }
+        .activity-item.no-click { cursor: default; }
+        .activity-item.no-click:hover { color: inherit; }
+        .activity-item.no-click .icon { display: none; }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.7);
+            backdrop-filter: blur(5px);
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: 2vh auto;
+            padding: 0;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 700px;
+            position: relative;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+            animation: slideUp 0.4s ease;
+            overflow: hidden;
+        }
+
+        @keyframes slideUp {
+            from {transform: translateY(100px); opacity: 0;}
+            to {transform: translateY(0); opacity: 1;}
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            width: 36px;
+            height: 36px;
+            background: rgba(255,255,255,0.8);
+            color: var(--secondary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 102;
+            transition: all 0.2s;
+            backdrop-filter: blur(2px);
+        }
+        .close-btn:hover { background: white; transform: rotate(90deg); }
+
+        .modal-img-container {
+            width: 100%;
+            height: 300px;
+            position: relative;
+        }
+
+        .modal-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .modal-body { padding: 30px; }
+        .modal-body h2 { color: var(--secondary); margin: 0 0 15px 0; font-size: 2rem; }
+        
+        .modal-tags { margin-bottom: 20px; }
+        .tag {
+            display: inline-block;
+            background: #f0f0f0;
+            color: var(--text-light);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+
+        .modal-desc-block {
+            margin-bottom: 20px;
+            border-left: 3px solid var(--primary);
+            padding-left: 15px;
+            background: rgba(212, 165, 165, 0.05);
+            padding: 15px;
+            border-radius: 0 10px 10px 0;
+        }
+        
+        .modal-desc-block strong { color: var(--secondary); display: block; margin-bottom: 5px; font-size: 1.1rem;}
+        .modal-desc-block p { margin: 0; color: var(--text-light); font-size: 0.95rem;}
+        .food-emoji { font-size: 1.4rem; margin-right: 5px; }
+
+        /* Recommendations */
+        .alternatives {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .alt-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            border: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+            text-align: left;
+        }
+        .alt-card:hover { transform: translateY(-5px); }
+        .alt-card h3 { color: var(--primary); margin-top: 0; display: flex; align-items: center;}
+        .alt-card h3 span { margin-right: 10px; font-size: 1.4rem; }
+        .alt-card p { color: var(--text-light); font-size: 0.95rem; margin-bottom: 0;}
+
+        footer {
+            text-align: center;
+            padding: 60px 20px;
+            background: var(--secondary);
+            color: rgba(255,255,255,0.7);
+            margin-top: 80px;
+            font-weight: 300;
+        }
+        footer p span { color: var(--primary); font-size: 1.2rem; }
+
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Nagoya 2026</h1>
+    <p>Jan 1 - Jan 5 • 我們的浪漫跨年之旅</p>
+</header>
+
+<div class="container">
+    <h2 class="section-title"><span>每日行程總覽</span></h2>
+    
+    <div class="timeline">
+        <div class="day-card">
+            <div class="day-date">
+                <div class="date">1/1</div>
+                <div class="weekday">週四</div>
+            </div>
+            <div class="day-content">
+                <h3>第一天：抵達與初詣祈福</h3>
+                <ul class="activity-list">
+                    <li class="activity-item" onclick="openModal('spot1')">
+                        <span class="time">09:00</span> 天然溫泉 Urban Quar <span class="icon">➔</span>
+                    </li>
+                    <li class="activity-item" onclick="openModal('spot2')">
+                        <span class="time">15:00</span> 熱田神宮 (新年初詣) <span class="icon">➔</span>
+                    </li>
+                    <li class="activity-item" onclick="openModal('spot3')">
+                        <span class="time">17:00</span> 大須商店街 / 大須觀音 <span class="icon">➔</span>
+                    </li>
+                    <li class="activity-item" onclick="openModal('spot4')">
+                        <span class="time">18:00</span> 日本超市晚餐大採購 <span class="icon">➔</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="day-card">
+            <div class="day-date">
+                <div class="date">1/2</div>
+                <div class="weekday">週五</div>
+            </div>
+            <div class="day-content">
+                <h3>第二天：歷史名城與在地美食</h3>
+                <ul class="activity-list">
+                    <li class="activity-item" onclick="openModal('spot5')">
+                        <span class="time">08:00</span> Tsubame Bread&Milk <span class="icon">➔</span>
+                    </li>
+                    <li class="activity-item" onclick="openModal('spot6')">
+                        <span class="time">10:30</span> 名古屋城 <span class="icon">➔</span>
+                    </li>
+                    <li class="activity-item" onclick="openModal('spot7')">
+                        <span class="time">12:00</span> 金鯱橫丁 (午餐) <span class="icon">➔</span>
+                    </li>
+                    <li class="activity-item" onclick="openModal('spot8')">
+                        <span class="time">14:30</span> 德川園 / 榮商圈散策 <span class="icon">➔</span>
+                    </li>
+                    <li class="activity-item" onclick="openModal('spot9')">
+                        <span class="time">18:45</span> Hitsumabushi Ichiyo 鰻魚飯 <span class="icon">➔</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="day-card">
+            <div class="day-date">
+                <div class="date">1/3</div>
+                <div class="weekday">週六</div>
+            </div>
+            <div class="day-content">
+                <h3>第三天：童話雪景一日遊</h3>
+                <ul class="activity-list">
+                    <li class="activity-item" onclick="openModal('spot10')">
+                        <span class="time">全日</span> 高山市 & 白川鄉合掌村 <span class="icon">➔</span>
+                    </li>
+                    <li class="activity-item" onclick="openModal('spot11')">
+                        <span class="time">19:00</span> Maruchu (燒肉晚餐) <span class="icon">➔</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="day-card">
+            <div class="day-date">
+                <div class="date">1/4</div>
+                <div class="weekday">週日</div>
+            </div>
+            <div class="day-content">
+                <h3>第四天：高空絕景與賦歸</h3>
+                <ul class="activity-list">
+                    <li class="activity-item" onclick="openModal('spot12')">
+                        <span class="time">07:55</span> 御在所岳 (纜車/樹冰) <span class="icon">➔</span>
+                    </li>
+                    <li class="activity-item no-click">
+                        <span class="time">下午</span> 返回市區自由活動 / 前往機場
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="section-title"><span>更多行程備選 (More Options)</span></h2>
+    <div class="alternatives">
+        <div class="alt-card" onclick="openModal('alt1')" style="cursor: pointer;">
+            <h3><span>✨</span> 名花之里 (Nabana no Sato)</h3>
+            <p>日本最大級別的燈光秀。如果不去御在所岳，或者晚上有空，這裡非常浪漫，必去！(點擊看詳情)</p>
+        </div>
+        <div class="alt-card">
+            <h3><span>🚄</span> 磁浮鐵道館</h3>
+            <p>如果在最後一天還有時間，且對機械、火車有興趣，這裡是室內行程的好選擇。</p>
+        </div>
+        <div class="alt-card">
+            <h3><span>🛍️</span> 吉卜力公園</h3>
+            <p>愛知縣的新地標，重現宮崎駿動畫場景。注意：需要提前非常久預約門票。</p>
+        </div>
+        <div class="alt-card">
+            <h3><span>🗼</span> 中部電力塔 & Oasis 21</h3>
+            <p>就在榮商圈，晚上去「水的宇宙船」看夜景非常漂亮，是情侶拍照聖地。</p>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <p>Create wonderful memories together. <span>❤️</span> Nagoya 2026</p>
+</footer>
+
+<div id="modal" class="modal">
+    <div class="modal-content">
+        <div class="close-btn" onclick="closeModal()">&times;</div>
+        <div class="modal-img-container">
+            <img id="modal-img" class="modal-img" src="" alt="Spot Image">
+        </div>
+        <div class="modal-body">
+            <h2 id="modal-title">Title</h2>
+            <div id="modal-tags" class="modal-tags"></div>
+            <div id="modal-desc-container">
+                </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Data structure for expanded spot details
+    const spots = {
+        'spot1': {
+            title: '天然溫泉 Urban Quar',
+            img: 'https://images.unsplash.com/photo-1563496668-3017a47d252f?q=80&w=800&auto=format&fit=crop',
+            tags: ['放鬆', '紅眼班機救星', '現代錢湯'],
+            details: [
+                { title: '地理與特色', text: '位於名古屋市區的現代化大型「超級錢湯」（Super Sento）。距離市中心不遠，是搭乘紅眼班機抵達後，等待飯店 check-in 前的最佳去處。' },
+                { title: '體驗重點', text: '這裡不只是洗澡，更像個休閒中心。有多種不同溫度的溫泉池、桑拿，最棒的是有非常舒適的休息區、漫畫區和視聽室，可以舒服地補眠充電。' },
+                { title: '小提醒', text: '記得準備好替換衣物。日本的大眾溫泉通常是裸湯，請遵守入浴禮儀喔！' }
+            ]
+        },
+        'spot2': {
+            title: '熱田神宮 (Atsuta Jingu)',
+            img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Atsuta-jingu_Hongu_2016.jpg/800px-Atsuta-jingu_Hongu_2016.jpg',
+            tags: ['初詣', '國寶', '歷史'],
+            details: [
+                { title: '歷史背景', text: '擁有超過 1900 年的歷史，是日本地位僅次於伊勢神宮的古老神宮。這裡供奉著日本皇室三神器之一的「草薙劍」（Kusanagi no Tsurugi），在日本神話中有著極其重要的地位。' },
+                { title: '1/1 新年特色', text: '你們在元旦當天前往，正是日本的「初詣」（新年第一次參拜）。雖然人潮會非常洶湧，但能體驗到最道地的日本新年氣氛。境內會有許多屋台（小吃攤），非常熱鬧。' },
+                { title: '必吃美食', text: '<span class="food-emoji">🍜</span> <strong>宮きしめん (宮棊子麵)：</strong> 在神宮境內就有一家知名的麵店。在寒冷的冬天參拜完，來一碗熱騰騰、湯頭鮮美的名古屋特色寬扁麵，是定番行程！' },
+                { title: '有趣小知識', text: '織田信長在出征「桶狹間之戰」前，曾在此祈求勝利，結果以少勝多打贏了奇蹟般的一仗。因此這裡也被視為祈求必勝的聖地。' }
+            ]
+        },
+        'spot3': {
+            title: '大須商店街 / 大須觀音',
+            img: 'https://images.unsplash.com/photo-1570773669934-5853f081c7e9?q=80&w=800&auto=format&fit=crop',
+            tags: ['逛街', '邊走邊吃', '多元文化'],
+            details: [
+                { title: '地理與特色', text: '以「大須觀音寺」為中心向外輻射的龐大拱廊商店街。這裡被稱為「日本最充滿活力的商店街」，氣氛有點像東京的秋葉原加上原宿，融合了宅文化、古著店、異國料理和傳統老店。' },
+                { title: '必吃美食', text: '<span class="food-emoji">🍗</span> <strong>李さんの台湾名物屋台：</strong> 非常有名的炸雞店，老闆是台灣人，辣味炸雞超受歡迎。<br><span class="food-emoji">🍡</span> <strong>新雀本店：</strong> 門口總是大排長龍的烤糰子老店，醬油焦香味撲鼻。' },
+                { title: '有趣小知識', text: '大須是名古屋「御宅族文化」的發源地，也是世界 Cosplay 高峰會的舉辦地之一，所以在街上看到 Cosplayer 也不要太驚訝喔。' }
+            ]
+        },
+        'spot4': {
+            title: '日本超市晚餐大採購',
+            img: 'https://images.unsplash.com/photo-1606836588617-432272b1c294?q=80&w=800&auto=format&fit=crop',
+            tags: ['生活感', '省錢', '宵夜'],
+            details: [
+                { title: '體驗重點', text: '這不是一個特定景點，而是一種體驗！日本超市在晚上 7-8 點後通常會開始貼上「割引」（打折）貼紙。這是體驗當地生活感、又能省錢吃好料的最佳時刻。' },
+                { title: '推薦購買', text: '<span class="food-emoji">🍣</span> <strong>生魚片/壽司拼盤：</strong> 鮮度通常很不錯。<br><span class="food-emoji">🍓</span> <strong>當季草莓：</strong> 冬天的日本草莓又大又甜。<br><span class="food-emoji">🍶</span> <strong>地方清酒或Chu-hai：</strong> 買回飯店小酌一杯。' }
+            ]
+        },
+        'spot5': {
+            title: 'Tsubame Bread&Milk (つばめパン&Milk)',
+            img: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?q=80&w=800&auto=format&fit=crop',
+            tags: ['網紅名店', '名古屋早餐', '吐司'],
+            details: [
+                { title: '特色介紹', text: '近年來名古屋最紅的吐司專賣店之一。店名「Tsubame」是燕子的意思。他們使用北海道美瑛產的小麥和牛奶製作天然酵母吐司，口感非常柔軟濕潤。' },
+                { title: '必吃美食', text: '<span class="food-emoji">🍞</span> <strong>小倉紅豆奶油吐司 (小倉トースト)：</strong> 名古屋特有的早餐文化。厚切吐司上放上綿密的紅豆泥和一大塊融化的奶油，鹹甜交織的滋味非常罪惡又美味！' },
+                { title: '小提醒', text: '因為非常熱門，建議開店前就去排隊，以免行程延誤。' }
+            ]
+        },
+        'spot6': {
+            title: '名古屋城 (Nagoya Castle)',
+            img: 'https://images.unsplash.com/photo-1624869802096-74b88b0a961d?q=80&w=800&auto=format&fit=crop',
+            tags: ['地標', '德川家康', '歷史'],
+            details: [
+                { title: '歷史背景', text: '由開創江戶幕府的德川家康下令建造，是日本百大名城之一。原本的天守閣在二戰中燒毀，現在看到的是戰後重建的水泥建築（目前天守閣因耐震問題關閉中，無法登頂）。' },
+                { title: '參觀重點', text: '重點是旁邊花費鉅資、依據史料原木重建的**「本丸御殿」**。內部金碧輝煌的障壁畫和精緻的木造結構，能讓人感受到當年尾張德川家的權勢與奢華。' },
+                { title: '有趣小知識', text: '注意看屋頂兩端那對金光閃閃的生物，那叫「金鯱」（金のしゃちほこ），是龍首魚身的想像動物，被視為防火的守護神，也是名古屋市的象徵標誌。' }
+            ]
+        },
+        'spot7': {
+            title: '金鯱橫丁 (Kinshachi Yokocho)',
+            img: 'https://images.unsplash.com/photo-1580442696614-2c0b05b38992?q=80&w=800&auto=format&fit=crop',
+            tags: ['美食街', '名古屋めし', '午餐'],
+            details: [
+                { title: '地理與特色', text: '緊鄰名古屋城的美食主題街區，分為「義直區」（傳統老店）和「宗春區」（新創美食）。這裡聚集了幾乎所有著名的「名古屋めし」（名古屋當地美食）。' },
+                { title: '推薦美食', text: '如果不想跑遠，這裡就可以吃到知名的「矢場味噌豬排」、「山本屋總本家味噌烏龍麵」等名店。是參觀完城堡後解決午餐最方便的地方。' }
+            ]
+        },
+        'spot8': {
+            title: '德川園 / 榮 (Sakae) 商圈',
+            img: 'https://images.unsplash.com/photo-1599577742095-2c8c4883013d?q=80&w=800&auto=format&fit=crop',
+            tags: ['日式庭園', '購物', '市中心'],
+            details: [
+                { title: '德川園 (歷史)', text: '原本是尾張德川家的宅邸，現在是典型的日式「池泉回遊式」庭園。園內有巨大的湖泊、瀑布和橋樑，四季風景不同，非常適合飯後散步，感受大名庭園的雅緻。' },
+                { title: '榮商圈 (地理)', text: '名古屋最繁華的市中心。有名古屋電視塔、Oasis 21（綠洲21）等地標。百貨公司林立（三越、松坂屋、PARCO），想購物來這裡就對了。' }
+            ]
+        },
+        'spot9': {
+            title: 'Hitsumabushi Ichiyo (鰻魚飯)',
+            img: 'https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?q=80&w=800&auto=format&fit=crop',
+            tags: ['必吃', '鰻魚三吃', '晚餐'],
+            details: [
+                { title: '美食背景', text: '名古屋的鰻魚飯特色是「ひつまぶし」（Hitsumabushi），將蒲燒鰻魚切細鋪在飯上，並裝在木桶裡。其特色是烤得比較焦脆，醬汁濃郁。' },
+                { title: '必學！鰻魚三吃法', text: '<ol style="margin:0; padding-left:20px;"><li>第一碗：盛出來直接吃，品嚐鰻魚原味和炭火香。</li><li>第二碗：加入附上的藥味（蔥花、芥末、海苔），攪拌後食用，風味更清爽。</li><li>第三碗：加入特製的高湯，變成「鰻魚茶泡飯」，完美收尾。</li></ol>' },
+                { title: '餐廳特色', text: 'Ichiyo (一期) 是評價很好的名店，講究使用高品質的鰻魚和備長炭燒烤。' }
+            ]
+        },
+        'spot10': {
+            title: '高山市 & 白川鄉合掌村',
+            img: 'https://images.unsplash.com/photo-1545624948-4e89279a044d?q=80&w=800&auto=format&fit=crop',
+            tags: ['世界遺產', '雪景', '飛驒小京都'],
+            details: [
+                { title: '白川鄉 (地理與歷史)', text: '位於深山豪雪地帶的世界文化遺產。為了抵禦嚴冬的大雪，發展出獨特的「合掌造」建築，屋頂傾斜呈60度，狀似雙手合十。冬天的白川鄉被厚雪覆蓋，傍晚點燈時就像童話故事裡的薑餅屋世界，極度浪漫。' },
+                { title: '高山市 (飛驒小京都)', text: '保留了江戶時代古色古香的街道（三町筋）。有許多釀酒廠、味噌店和手工藝品店。' },
+                { title: '必吃美食', text: '<span class="food-emoji">🥩</span> <strong>飛驒牛握壽司：</strong> 在高山老街一定要吃！入口即化的頂級和牛放在醋飯上，通常用仙貝當盤子盛裝。<br><span class="food-emoji">🍢</span> <strong>五平餅：</strong> 將米飯壓扁裹上味噌烤製的鄉土料理。' },
+                { title: '重要提醒', text: '山區氣溫極低，請務必穿著防滑、防水的雪靴和保暖衣物。1/3 是日本新年假期，交通務必提前確認。' }
+            ]
+        },
+        'spot11': {
+            title: 'Maruchu (燒肉)',
+            img: 'https://images.unsplash.com/photo-1594041680534-e8c8cdebd659?q=80&w=800&auto=format&fit=crop',
+            tags: ['晚餐', '慶祝', '和牛'],
+            details: [
+                { title: '體驗重點', text: '從寒冷的山區回到市區後，沒有什麼比吃一頓熱騰騰的燒肉更棒的了！Maruchu 是一家提供優質肉品的人氣燒肉店。' },
+                { title: '推薦', text: '可以點一份包含多種部位的和牛拼盤，搭配一杯生啤酒或Highball，好好慶祝這趟旅程的高潮。' }
+            ]
+        },
+        'spot12': {
+            title: '御在所岳 (Mount Gozaisho)',
+            img: 'https://images.unsplash.com/photo-1610443292415-46f364e26245?q=80&w=800&auto=format&fit=crop',
+            tags: ['自然絕景', '纜車', '樹冰'],
+            details: [
+                { title: '地理特色', text: '位於三重縣與滋賀縣交界，標高1212公尺。需要搭乘巴士再轉乘全日本數一數二長的「御在所纜車」上山。' },
+                { title: '冬季限定：樹冰', text: '這裡以冬季的「樹冰」（Ice Monster）奇景聞名。水氣附著在樹枝上結冰，層層堆疊形成奇特的白色怪獸形狀。' },
+                { title: '體驗重點', text: '搭乘纜車時的視野非常開闊，可以俯瞰伊勢灣。山頂有展望台和滑雪場。請注意山頂非常冷，風很大，保暖裝備不可少。' }
+            ]
+        },
+        // Alternative Option Detail Example
+        'alt1': {
+            title: '名花之里 (Nabana no Sato)',
+            img: 'https://images.unsplash.com/photo-1512504568066-26fdf6c8fb75?q=80&w=800&auto=format&fit=crop',
+            tags: ['燈光秀', '浪漫', '夜景'],
+            details: [
+                { title: '特色介紹', text: '日本國內最大級別的冬季燈光秀。最著名的是長達200公尺的「光之隧道」，被數百萬顆LED燈泡包圍，極度夢幻。每年還有不同主題的大型燈海區。' },
+                { title: '推薦理由', text: '如果第四天御在所岳天氣不佳，或者你們晚上還有體力，強烈推薦來這裡。非常適合情侶拍照留念。' }
+            ]
+        }
+    };
+
+    function openModal(spotId) {
+        const modal = document.getElementById('modal');
+        const spot = spots[spotId];
+        const descContainer = document.getElementById('modal-desc-container');
+        const tagsContainer = document.getElementById('modal-tags');
+        
+        if (spot) {
+            document.getElementById('modal-title').innerText = spot.title;
+            document.getElementById('modal-img').src = spot.img;
+            
+            // Clear previous content
+            descContainer.innerHTML = '';
+            tagsContainer.innerHTML = '';
+
+            // Generate tags
+            spot.tags.forEach(tag => {
+                const span = document.createElement('span');
+                span.className = 'tag';
+                span.innerText = '#' + tag;
+                tagsContainer.appendChild(span);
+            });
+
+            // Generate description blocks
+            spot.details.forEach(detail => {
+                const block = document.createElement('div');
+                block.className = 'modal-desc-block';
+                
+                const title = document.createElement('strong');
+                title.innerText = detail.title;
+                
+                const text = document.createElement('p');
+                // Use innerHTML to allow basic HTML tags like <strong> and <br> in the text data
+                text.innerHTML = detail.text; 
+                
+                block.appendChild(title);
+                block.appendChild(text);
+                descContainer.appendChild(block);
+            });
+
+            modal.style.display = "block";
+            // Disable scrolling on body when modal is open
+            document.body.style.overflow = 'hidden';
+        }
+    }
+
+    function closeModal() {
+        document.getElementById('modal').style.display = "none";
+        // Re-enable scrolling
+        document.body.style.overflow = 'auto';
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+        const modal = document.getElementById('modal');
+        if (event.target == modal) {
+            closeModal();
+        }
+    }
+</script>
+
+</body>
+</html>
